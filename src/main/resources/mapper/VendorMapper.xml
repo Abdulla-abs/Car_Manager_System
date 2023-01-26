@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.spingboot.dao.VendorMapper">
+
+    <!--    单个插入-->
+    <insert id="insert">
+        insert into mst_vendor(
+            vendor_id,vendor_name
+        )value (
+            #{vendorId},#{vendorName}
+        )
+    </insert>
+    <!--    单个插入部分-->
+    <insert id="insertSelective">
+        insert into mst_vendor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">
+                vendor_id,
+            </if>
+            <if test="vendorName != null">
+                vendor_name,
+            </if>
+            <if test="deleteFlag != null">
+                deleteFlag,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">
+                #{vendorId},
+            </if>
+            <if test="vendorName != null">
+                #{vendorName},
+            </if>
+            <if test="deleteFlag != null">
+                #{deleteFlag},
+            </if>
+        </trim>
+    </insert>
+    <!--    多个插入-->
+    <insert id="insertBatch">
+        <foreach collection="list" item="vendor" separator=";" close=";">
+            insert into mst_vendor
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="vendor.vendorId != null">
+                    vendor_id,
+                </if>
+                <if test="vendor.vendorName != null">
+                    vendor_name,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="vendor.vendorId != null">
+                    #{vendor.vendorId},
+                </if>
+                <if test="vendor.vendorName != null">
+                    #{vendor.vendorName},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+
+    <!--    根据主键更新-->
+    <update id="updateByPrimaryKey">
+        update mst_vendor set vendor_name = #{vendorName}, delete_flag = #{deleteFlag}  where vendor_id = #{vendorId}
+    </update>
+
+<!--    主键更新部分-->
+    <update id="updateByPrimaryKeySelective">
+        update mst_vendor
+        <set>
+            <if test="vendorName != null">
+                vendor_name = #{vendorName},
+            </if>
+            <if test="deleteFlag != null">
+                delete_flag = #{deleteFlag},
+            </if>
+        </set>
+        where vendor_id = #{vendorId}
+    </update>
+
+<!--    批量更新-->
+    <update id="updateBatch">
+        <foreach collection="list" item="vendor" separator=";" close=";">
+            update mst_vendor
+            <set>
+                <if test="vendor.vendorName != null">
+                    vendor_name = #{vendor.vendorName},
+                </if>
+                <if test="vendor.deleteFlag != null">
+                    delete_flag = #{vendor.deleteFlag},
+                </if>
+            </set>
+            where vendor_id = #{vendor.vendorId}
+        </foreach>
+    </update>
+
+<!--    单个删除-->
+    <update id="deleteByPrimaryKey">
+        update mst_vendor set delete_flag = 1 where vendor_id = #{vendorId}
+    </update>
+
+<!--    批量删除-->
+    <update id="deleteBatch">
+        <foreach collection="array" item="i" separator=";" close=";">
+            update mst_vendor set delete_flag = 1 where vendor_id = #{i}
+        </foreach>
+    </update>
+
+    <sql id="Base_Column_List">
+        vendor_id,vendor_name,delete_flag
+    </sql>
+
+<!--    根据主键查找-->
+    <select id="selectByPrimaryKey" resultType="com.example.spingboot.domain.entity.Vendor">
+        select
+        <include refid="Base_Column_List"/>
+        from mst_vendor
+        where vendor_id = #{vendorId}
+    </select>
+
+    <resultMap id="BaseResultMap" type="com.example.spingboot.domain.entity.Vendor">
+        <id column="vendor_id" property="vendorId"/>
+        <result column="vendor_name" property="vendorName"/>
+    </resultMap>
+<!--    分页查找全部-->
+    <select id="selectListAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from mst_vendor
+        <if test="currentPage != null and pageSize != null">
+            <bind name="start" value="(currentPage - 1) * pageSize"/>
+            <bind name="end" value="pageSize"/>
+            limit #{start},#{end}
+        </if>
+    </select>
+
+    <sql id="Selective_If_List">
+        <where>
+            delete_flag = 0
+            <if test="vendorId != null">
+                and vendor_id = #{vendorId}
+            </if>
+            <if test="vendorName != null">
+                and vendor_name like concat ('%',#{vendorName},'%')
+            </if>
+        </where>
+    </sql>
+
+<!--    按部分模糊查找-->
+    <select id="selectListBySelective" resultMap="BaseResultMap">
+        select 
+        <include refid="Base_Column_List"></include>
+        from mst_vendor
+        <include refid="Selective_If_List"></include>
+        <if test="currentPage != null and pageSize != null">
+            <bind name="start" value="(currentPage - 1) * pageSize"/>
+            <bind name="end" value="pageSize"/>
+            limit #{start},#{end}
+        </if>
+    </select>
+<!--查询数量-->
+    <select id="selectCountAll" resultType="Integer">
+         select count(1) from mst_vendor
+    </select>
+
+</mapper>

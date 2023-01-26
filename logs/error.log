@@ -1,0 +1,36 @@
+2022-05-13 20:52:35.307[ERROR][restartedMain][org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter]: 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field userDetailsService in com.example.spingboot.config.SecurityConfig required a bean of type 'org.springframework.security.core.userdetails.UserDetailsService' that could not be found.
+
+The injection point has the following annotations:
+	- @org.springframework.beans.factory.annotation.Autowired(required=true)
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.security.core.userdetails.UserDetailsService' in your configuration.
+
+2022-05-13 20:54:00.610[ERROR][restartedMain][org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter]: 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field userLoginFailureHandler in com.example.spingboot.config.SecurityConfig required a bean of type 'com.example.spingboot.aop.UserLoginFailureHandler' that could not be found.
+
+The injection point has the following annotations:
+	- @org.springframework.beans.factory.annotation.Autowired(required=true)
+
+
+Action:
+
+Consider defining a bean of type 'com.example.spingboot.aop.UserLoginFailureHandler' in your configuration.
+

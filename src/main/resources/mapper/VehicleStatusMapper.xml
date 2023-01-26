@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.spingboot.dao.VehicleStatusMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.spingboot.domain.entity.VehicleStatus">
+        <id column="vehicle_status_code" property="vehicleStatusCode"/>
+        <result column="vehicle_status_name" property="vehicleStatusName"/>
+    </resultMap>
+
+    <resultMap id="ExtendsResultMap" type="com.example.spingboot.domain.dto.SelectDto">
+        <id column="vehicle_status_code" property="value"/>
+        <result column="vehicle_status_name" property="label"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        vehicle_status_code,vehicle_status_name
+    </sql>
+
+<!--    获取下拉选择器-->
+    <select id="selectListOption" resultMap="ExtendsResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from mst_vehicle_status
+    </select>
+
+<!--    添加数据-->
+    <insert id="insert">
+        insert into mst_vehicle_status (vehicle_status_code,vehicle_status_name) values (#{vehicleStatusCode},#{vehicleStatusName})
+    </insert>
+
+</mapper>

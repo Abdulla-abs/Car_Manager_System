@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.spingboot.dao.AuditResultMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.spingboot.domain.dto.AuditResultDto">
+        <result column="audit_date" property="auditDate"/>
+        <result column="audit_status" property="auditStatus"/>
+        <result column="audit_comment" property="auditComment"/>
+        <result column="audit_name" property="auditName"/>
+        <result column="audit_version" property="auditVersion"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        audit_date,audit_status,audit_comment,auditor_name,audit_version
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.example.spingboot.domain.vo.AuditResultVo">
+        select
+        <include refid="Base_Column_List"></include>
+        from trn_audit_result
+        where audit_id = #{auditId} and detail_id = #{detailId}
+    </select>
+
+    <insert id="insert">
+        insert into trn_audit_result (audit_id,detail_id) values (#{auditId},#{detailId});
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update trn_audit_result
+        <set>
+            <if test="auditStatus != null">
+                audit_status = #{auditStatus},
+            </if>
+            <if test="auditComment != null">
+                audit_comment = #{auditComment},
+            </if>
+            <if test="auditorId != null">
+                auditor_id = #{auditorId},
+            </if>
+            <if test="auditorName != null">
+                auditor_name = #{auditorName},
+            </if>
+            <if test="auditVersion != null">
+                audit_version = #{auditVersion},
+            </if>
+        </set>
+        where audit_id = #{auditId} and detail_id = #{detailId}
+        <![CDATA[and audit_version < #{auditVersion}]]>
+    </update>
+
+</mapper>

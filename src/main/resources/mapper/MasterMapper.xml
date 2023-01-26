@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.spingboot.dao.MasterMapper">
+<!--    插入一个-->
+    <insert id="insert">
+        insert into mst_master(
+            account_id,account_password,account_type,vendor_id,account_name
+        )value (
+            #{accountId},#{accountPassword},#{accountType},#{vendorId},#{accountName}
+        )
+    </insert>
+<!--插入不完整的一个-->
+    <insert id="insertSelective">
+        insert into mst_master
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountId != null">
+                account_id,
+            </if>
+            <if test="accountPassword != null">
+                account_password,
+            </if>
+            <if test="accountType != null">
+                account_type,
+            </if>
+            <if test="vendorId != null">
+                vendor_id,
+            </if>
+            <if test="accountName != null">
+                account_name,
+            </if>
+        </trim>
+        <trim prefix="values ("  suffix=")" suffixOverrides=",">
+            <if test="accountId != null">
+                #{accountId},
+            </if>
+            <if test="accountPassword != null">
+                #{accountPassword},
+            </if>
+            <if test="accountType != null">
+                #{accountType},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId},
+            </if>
+            <if test="accountName != null">
+                #{accountName},
+            </if>
+        </trim>
+    </insert>
+<!--批量插入-->
+    <insert id="insertBatch">
+        <foreach collection="list" item="master" separator=";" close=";">
+            insert into mst_master
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="master.accountId != null">
+                    account_id,
+                </if>
+                <if test="master.accountPassword != null">
+                    account_password,
+                </if>
+                <if test="master.accountType != null">
+                    account_type,
+                </if>
+                <if test="master.vendorId != null">
+                    vendor_id,
+                </if>
+                <if test="master.accountName != null">
+                    account_name,
+                </if>
+            </trim>
+            <trim prefix="values ("  suffix=")" suffixOverrides=",">
+                <if test="master.accountId != null">
+                    #{master.accountId},
+                </if>
+                <if test="master.accountPassword != null">
+                    #{master.accountPassword},
+                </if>
+                <if test="master.accountType != null">
+                    #{master.accountType},
+                </if>
+                <if test="master.vendorId != null">
+                    #{master.vendorId},
+                </if>
+                <if test="master.accountName != null">
+                    #{master.accountName},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+<!--根据主键更新-->
+    <update id="updateByPrimaryKey">
+        update mst_master set
+            account_password = #{accountPassword},
+            account_type = #{accountType},
+            vendor_id = #{vendorId},
+            account_name = #{accountName}
+            where account_id = #{accountId}
+    </update>
+<!--根据主键更新部分-->
+    <update id="updateByPrimaryKeySelective">
+        update mst_master
+        <set>
+            <if test="accountPassword != null">
+                account_password = #{accountPassword},
+            </if>
+            <if test="accountType != null">
+                account_type = #{accountType},
+            </if>
+            <if test="vendorId != null">
+                vendor_id = #{vendorId},
+            </if>
+            <if test="accountName != null">
+                account_name = #{accountName},
+            </if>
+        </set>
+        where account_id = #{accountId}
+    </update>
+<!--批量更新-->
+    <update id="updateBatch">
+        <foreach collection="list" item="master" separator=";" close=";">
+            update mst_master
+            <set>
+                <if test="master.accountPassword != null">
+                    account_password = #{master.accountPassword},
+                </if>
+                <if test="master.accountType != null">
+                    account_type = #{master.accountType},
+                </if>
+                <if test="master.vendorId != null">
+                    vendor_id = #{master.vendorId},
+                </if>
+                <if test="master.accountName != null">
+                    account_name = #{master.accountName},
+                </if>
+            </set>
+            where account_id = #{master.accountId}
+        </foreach>
+    </update>
+<!--根据主键删除-->
+    <delete id="deleteByPrimaryKey">
+        delete from mst_master where account_id = #{primaryKey}
+    </delete>
+<!--批量删除-->
+    <delete id="deleteBatch">
+        delete from mst_master where account_id in
+        <foreach collection="array" item="i" separator="," open="(" close=")">
+            #{i}
+        </foreach>
+    </delete>
+<!--根据主键查找-->
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ExtendsResultMap">
+        select
+         <include refid="Base_Column_List"/>
+         <include refid="Extends_Column_List"/>
+         from mst_master a left join mst_vendor b on (a.vendor_id = b.vendor_id) where a.account_id = #{accountId}
+    </select>
+
+    <resultMap id="BaseResultMap" type="com.example.spingboot.domain.entity.Master">
+        <id column="account_id" property="accountId"/>
+        <result column="account_name" property="accountName"/>
+        <result column="account_type" property="accountType"/>
+        <result column="account_password" property="accountPassword"/>
+    </resultMap>
+    
+    <resultMap extends="BaseResultMap" id="ExtendsResultMap" type="com.example.spingboot.domain.dto.MasterDto">
+        <id column="vendor_id" property="vendorId"/>
+        <result column="vendor_name" property="vendorName"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        account_id,account_name,account_type,account_password
+    </sql>
+    
+    <sql id="Extends_Column_List">
+        ,b.vendor_id,b.vendor_name
+    </sql>
+<!--分页查找全部-->
+    <select id="selectListAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from mst_master
+        <if test="currentPage != null and pageSize != null">
+            <bind name="start" value="(currentPage - 1) * pageSize"/>
+            <bind name="end" value="pageSize"/>
+            limit #{start},#{end}
+        </if>
+    </select>
+<!--查询总数-->
+    <select id="selectCountAll" resultType="Integer">
+        select count(1) from mst_master
+    </select>
+</mapper>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.spingboot.dao.CommentLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.spingboot.domain.entity.CommentLog">
+        <id column="log_id" property="logId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="comment_log" property="commentLog"/>
+        <result column="account_id" property="accountId"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        log_id,create_time,comment_log,account_id
+    </sql>
+
+    <sql id="Selective_If_List">
+        <where>
+            <if test="createTimeFrom != null">
+                create_time >= #{createTimeFrom}
+            </if>
+            <if test="createTimeTo != null">
+                <![CDATA[]
+                and create_time <= #{createTimeTo}
+            ]]>
+            </if>
+        </where>
+    </sql>
+
+<!--    动态查询-->
+    <select id="selectListBySelective" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from mst_comment_log
+        <include refid="Selective_If_List"></include>
+        <if test="currentPage != null and pageSize != null">
+            <bind name="start" value="(currentPage - 1) * pageSize"/>
+            <bind name="end" value="pageSize"/>
+            limit #{start},#{end}
+        </if>
+    </select>
+
+<!--    条件统计-->
+    <select id="selectCountBySelective" resultType="int">
+        select count(1) from mst_comment_log
+        <include refid="Selective_If_List"></include>
+    </select>
+
+<!--    插入数据-->
+    <insert id="insert" parameterType="com.example.spingboot.domain.entity.CommentLog">
+        insert into mst_comment_log (comment_log,account_id) values (#{commentLog},#{accountId});
+    </insert>
+
+<!--    删除-->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from mst_comment_log where log_id = #{logId}
+    </delete>
+
+<!--    批量删除-->
+    <delete id="deleteBatch">
+        delete from mst_comment_log where log_id in
+        <foreach collection="array" item="logId" open="(" close=")" separator=",">
+            #{logId}
+        </foreach>
+    </delete>
+
+
+
+</mapper>

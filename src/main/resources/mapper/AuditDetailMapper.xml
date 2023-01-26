@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.spingboot.dao.AuditDetailMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.spingboot.domain.dto.AuditDetailDto">
+        <id column="detail_id" property="detailId"/>
+        <result column="audit_id" property="auditId"/>
+        <result column="maker" property="maker"/>
+        <result column="vehicle_category" property="vehicleCategory"/>
+        <result column="barcode" property="barCode"/>
+        <result column="vehicle_class" property="vehicleClass"/>
+        <result column="vehicle_status" property="vehicleStatus"/>
+        <result column="audit_status" property="auditStatus"/>
+        <result column="auditor_name" property="auditorName"/>
+        <result column="update_date" property="updateDate"/>
+    </resultMap>
+
+    <resultMap id="ReferenceResultMap" type="com.example.spingboot.domain.dto.AuditDetailReferenceDto">
+        <id column="detail_id" property="detailId"/>
+        <result column="front_photo" property="frontPhoto"/>
+        <result column="frame_photo" property="framePhoto"/>
+        <result column="left_photo" property="leftPhoto"/>
+        <result column="right_photo" property="rightPhoto"/>
+        <result column="number_plate" property="numberPlate"/>
+        <result column="vehicle_inspection" property="vehicleInspection"/>
+        <result column="color" property="color"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        a.detail_id,a.audit_id,maker,vehicle_category,barcode,vehicle_class,vehicle_status,audit_status,update_date,auditor_name
+    </sql>
+    
+    <sql id="Reference_Column_List">
+        detail_id,color,number_plate,vehicle_inspection,front_photo,frame_photo,left_photo,right_photo
+    </sql>
+    
+    <sql id="Selective_If_List">
+        <where>
+            <if test="auditIds != null">
+                a.audit_id in
+                <foreach collection="auditIds" item="auditId" open="(" separator="," close=")">
+                    #{auditId}
+                </foreach>
+            </if>
+            <if test="maker != null">
+                and maker like concat('%',#{maker},'%')
+            </if>
+            <if test="vehicleCategory != null">
+                and vehicle_category = #{vehicleCategory}
+            </if>
+            <if test="barCode != null">
+                and barcode = #{barCode}
+            </if>
+            <if test="vehicleClass != null">
+                and vehicle_class = #{vehicleClass}
+            </if>
+            <if test="vehicleStatus != null">
+                and vehicle_status = #{vehicleStatus}
+            </if>
+            <if test="auditStatus != null">
+                and audit_status = #{auditStatus}
+            </if>
+            <if test="auditorName != null">
+                and auditor_name = #{auditorName}
+            </if>
+            <if test="updateDateFrom != null">
+                and update_date >= #{updateDateFrom}
+            </if>
+            <if test="updateDateTo != null">
+                <![CDATA[and update_date <= #{updateDateTo}]]>
+            </if>
+        </where>
+    </sql>
+    
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="detailId" keyColumn="detail_id">
+        insert into trn_audit_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="auditId != null">
+                audit_id,
+            </if>
+            <if test="maker != null">
+                maker,
+            </if>
+            <if test="vehicleCategory != null">
+                vehicle_category,
+            </if>
+            <if test="barCode != null">
+                barcode,
+            </if>
+            <if test="color != null">
+                color,
+            </if>
+            <if test="vehicleClass != null">
+                vehicle_class,
+            </if>
+            <if test="numberPlate != null">
+                number_plate,
+            </if>
+            <if test="vehicleInspection != null">
+                vehicle_inspection,
+            </if>
+            <if test="vehicleStatus != null">
+                vehicle_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="auditId != null">
+                #{auditId},
+            </if>
+            <if test="maker != null">
+                #{maker},
+            </if>
+            <if test="vehicleCategory != null">
+                #{vehicleCategory},
+            </if>
+            <if test="barCode != null">
+                #{barCode},
+            </if>
+            <if test="color != null">
+                #{color},
+            </if>
+            <if test="vehicleClass != null">
+                #{vehicleClass},
+            </if>
+            <if test="numberPlate != null">
+                #{numberPlate},
+            </if>
+            <if test="vehicleInspection != null">
+                #{vehicleInspection},
+            </if>
+            <if test="vehicleStatus != null">
+                #{vehicleStatus},
+            </if>
+        </trim>
+    </insert>
+    
+    <update id="updateByPrimaryKeySelective">
+        update trn_audit_detail
+        <set>
+            <if test="detailId != null">
+                detail_id = #{detailId},
+            </if>
+            <if test="maker != null">
+                maker = #{maker},
+            </if>
+            <if test="vehicleCategory != null">
+                vehicle_category = #{vehicleCategory},
+            </if>
+            <if test="barCode != null">
+                barcode = #{barCode},
+            </if>
+            <if test="color != null">
+                color = #{color},
+            </if>
+            <if test="vehicleClass != null">
+                vehicle_class = #{vehicleClass},
+            </if>
+            <if test="numberPlate != null">
+                number_plate = #{numberPlate},
+            </if>
+            <if test="vehicleInspection != null">
+                vehicle_inspection = #{vehicleInspection},
+            </if>
+            <if test="vehicleStatus != null">
+                vehicle_status = #{vehicleStatus},
+            </if>
+        </set>
+        where detail_id = #{detailId}
+    </update>
+    
+    <update id="updateBLOBsByPrimaryKey">
+        update trn_audit_detail
+        <set>
+            <if test="frontPhoto != null">
+                front_photo = #{frontPhoto},
+            </if>
+            <if test="framePhoto != null">
+                frame_photo = #{framePhoto},
+            </if>
+            <if test="leftPhoto != null">
+                left_photo = #{leftPhoto},
+            </if>
+            <if test="rightPhoto != null">
+                right_photo = #{rightPhoto},
+            </if>
+        </set>
+        where detail_id = #{detailId}
+    </update>
+    
+    <select id="selectListBySelective" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from trn_audit_detail a left join trn_audit_header b on (a.audit_id = b.audit_id)
+        left join trn_audit_result c on (a.detail_id = c.detail_id)
+        <include refid="Selective_If_List"></include>
+        <if test="currentPage != null and pageSize != null">
+            <bind name="start" value="(currentPage - 1) * pageSize"/>
+            <bind name="end" value="pageSize"/>
+            limit #{start},#{end}
+        </if>
+    </select>
+    
+    <select id="selectCountBySelective" resultType="int">
+            select count(1) from  trn_audit_detail a left join trn_audit_header b on (a.audit_id = b.audit_id) left join trn_audit_result c on (a.detail_id = c.detail_id)
+            <include refid="Selective_If_List"></include>
+    </select>
+
+    <select id="selectReferenceByPrimaryKey" resultMap="ReferenceResultMap">
+        select
+        <include refid="Reference_Column_List"></include>
+        from trn_audit_detail where detail_id = #{detailId}
+    </select>
+
+</mapper>

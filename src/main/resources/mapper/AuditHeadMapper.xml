@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.spingboot.dao.AuditHeadMapper">
+    
+    <resultMap id="BaseResultMap" type="com.example.spingboot.domain.entity.AuditHead">
+        <id column="audit_id" property="auditId"/>
+        <result column="period_ym" property="periodYm"/>
+        <result column="period_no" property="periodNo"/>
+        <result column="dealer_code" property="dealerCode"/>
+        <result column="dealer_name" property="dealerName"/>
+        <result column="judge_date" property="judgeDate"/>
+        <result column="insert_date" property="insertDate"/>
+        <result column="update_date" property="updateDate"/>
+    </resultMap>
+
+    <resultMap id="ExtendsResultMap" extends="BaseResultMap" type="com.example.spingboot.domain.dto.AuditHeadDto">
+        <result column="audit_status" property="auditStatus"/>
+        <result column="audit_date" property="auditDate"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        a.audit_id,period_ym,period_no,dealer_code,dealer_name,judge_date,insert_date,update_date
+    </sql>
+
+    <sql id="Extends_Column_List">
+        audit_status,audit_date
+    </sql>
+
+    <sql id="Selective_If_List">
+        <where>
+            <if test="periodYm != null">
+                period_ym = #{periodYm}
+            </if>
+            <if test="periodNo != null">
+                period_no = #{periodNo}
+            </if>
+            <if test="dealerCode != null">
+                dealer_code = #{dealerCode}
+            </if>
+            <if test="dealerName != null">
+                and dealer_name like concat('%',#{dealerName},'%')
+            </if>
+            <if test="updateDateFrom != null">
+                and update_date >= #{updateDateFrom}
+            </if>
+            <if test="updateDateTo != null">
+                <![CDATA[and update_date <= #{updateDateTo}]]>
+            </if>
+            <if test="auditDateFrom != null">
+                and audit_date >= #{auditDateFrom}
+            </if>
+            <if test="auditDateTo != null">
+                <![CDATA[and audit_date <= #{auditDateTo}]]>
+            </if>
+            <if test="auditStatus != null">
+                and audit_status = #{auditStatus}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectByPeriodYm" resultType="String">
+        select period_no from trn_audit_header where period_ym = #{periodYm}
+    </select>
+
+    <select id="selectByDealer" resultType="Integer" >
+        select audit_id from trn_audit_header
+        <where>
+            <if test="dealers != null">
+                dealer_code in
+                <foreach collection="list" item="dealer" open="(" separator="," close=")">
+                    #{dealer.dealerCode}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertSelective">
+        insert into trn_audit_header
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="auditId != null">
+                audit_id,
+            </if>
+            <if test="periodYm != null">
+                period_ym,
+            </if>
+            <if test="periodNo != null">
+                period_no,
+            </if>
+            <if test="dealerCode != null">
+                dealer_code,
+            </if>
+            <if test="dealerName != null">
+                dealer_name,
+            </if>
+            <if test="judgeDate != null">
+                judge_date,
+            </if>
+            <if test="insertUser != null">
+                insert_user,
+            </if>
+            <if test="insertDate != null">
+                insert_date,
+            </if>
+            <if test="updateUser != null">
+                update_user,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="auditId != null">
+                #{auditId},
+            </if>
+            <if test="periodYm != null">
+                #{periodYm},
+            </if>
+            <if test="periodNo != null">
+                #{periodNo},
+            </if>
+            <if test="dealerCode != null">
+                #{dealerCode},
+            </if>
+            <if test="dealerName != null">
+                #{dealerName},
+            </if>
+            <if test="judgeDate != null">
+                #{judgeDate},
+            </if>
+            <if test="insertUser != null">
+                #{insertUser},
+            </if>
+            <if test="insertDate != null">
+                #{insertDate},
+            </if>
+            <if test="updateUser != null">
+                #{updateUser},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update trn_audit_header
+        <set>
+            <if test="periodYm != null">
+                period_ym = #{periodYm},
+            </if>
+            <if test="periodNo != null">
+                period_no = #{periodNo},
+            </if>
+            <if test="dealerCode != null">
+                dealer_code = #{dealerCode},
+            </if>
+            <if test="dealerName != null">
+                dealer_name = #{dealerName},
+            </if>
+            <if test="judgeDate != null">
+                judge_date = #{judgeDate},
+            </if>
+            <if test="insertUser != null">
+                insert_user = #{insertUser},
+            </if>
+            <if test="insertDate != null">
+                insert_date = #{insertDate},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </set>
+        where audit_id = #{auditId}
+    </update>
+
+    <select id="selectListBySelective" resultMap="ExtendsResultMap">
+        select
+        <include refid="Base_Column_List"></include>,
+        <include refid="Extends_Column_List"></include>
+        from trn_audit_header a left join trn_audit_result b
+        on (a.audit_id = b.audit_id)
+        <include refid="Selective_If_List"></include>
+        <if test="currentPage != null and pageSize != null">
+            <bind name="start" value="(currentPage - 1) * pageSize"/>
+            <bind name="end" value="pageSize"/>
+            limit #{start},#{end}
+        </if>
+    </select>
+
+    <select id="selectCountBySelective" resultType="int">
+        select count(1) from trn_audit_header a left join trn_audit_result b
+        on  (a.audit_id = b.audit_id)
+        <include refid="Selective_If_List"></include>
+    </select>
+
+</mapper>

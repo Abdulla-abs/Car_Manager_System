@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.spingboot.dao.DealerMapper">
+
+    <resultMap type="com.example.spingboot.domain.entity.Dealer" id="BaseResultMap">
+        <id column="dealer_code" property="dealerCode"/>
+        <result column=" dealer_name" property="dealerName"/>
+        <result column="vendor_id" property="vendorId"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        dealer_code,dealer_name,vendor_id
+    </sql>
+
+    <sql id="Selective_If_List">
+        <where>
+            delete_flag = 0
+            <if test="dealerCode != null">
+                and dealer_code = #{dealerCode}
+            </if>
+            <if test="dealerName != null">
+                and dealer_name like concat('%',#{dealerName},'%')
+            </if>
+        </where>
+    </sql>
+    <!--    插入一个-->
+    <insert id="insert">
+        insert into mst_dealer(
+            dealer_code,dealer_name,vendor_id
+        )values (
+            #{dealerCode},#{dealerName},#{vendorId}
+        )
+    </insert>
+
+    <!--批量插入-->
+    <insert id="insertBatch">
+        <foreach collection="list" item="dealer" separator=";" close=";">
+            insert into mst_dealer (dealer_code,dealer_name,vendor_id)
+            values (#{dealer.dealerCode},#{dealer.dealerName},#{dealer.vendorId})
+        </foreach>
+    </insert>
+
+    <!--根据主键更新-->
+    <update id="updateByPrimaryKey">
+        update mst_dealer set
+            dealer_name = #{dealerName},
+            delete_flag = #{deleteFlag},
+            vendor_id = #{vendorId}
+            where dealer_code = #{dealerCode}
+    </update>
+
+    <!--根据主键更新部分-->
+    <update id="updateByPrimaryKeySelective">
+        update mst_dealer
+        <set>
+            <if test="dealerName != null">
+                dealer_name = #{dealerName},
+            </if>
+            <if test="vendorId != null">
+                vendor_id = #{vendorId},
+            </if>
+            <if test="deleteFlag != null">
+                delete_flag = #{deleteFlag},
+            </if>
+        </set>
+        where dealer_code = #{dealerCode}
+    </update>
+    <!--批量更新-->
+    <update id="updateBatch">
+        <foreach collection="list" item="dealer" separator=";" close=";">
+            update mst_dealer
+            <set>
+                <if test="dealer.dealerName != null">
+                    dealer_name = #{dealer.dealerName},
+                </if>
+                <if test="dealer.vendorId != null">
+                    vendor_id = #{dealer.vendorId},
+                </if>
+                <if test="dealer.deleteFlag != null">
+                    delete_flag = #{dealer.deleteFlag},
+                </if>
+            </set>
+            where dealer_code = #{dealer.dealerCode}
+        </foreach>
+    </update>
+    <!--根据主键删除-->
+    <delete id="deleteByPrimaryKey">
+
+    </delete>
+    <!--批量删除-->
+    <delete id="deleteBatch">
+        <foreach collection="array" item="i" separator=";">
+            update mst_dealer set delete_flag = 1 where dealer_code = #{i}
+        </foreach>
+    </delete>
+
+<!--    查询供应商下所有经销商-->
+    <select id="selectListByVendorId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from mst_dealer
+        <where>
+            <if test="dealerCode != null">
+                dealer_code = #{dealerCode}
+            </if>
+        </where>
+    </select>
+
+<!--    按条件查询经销商-->
+    <select id="selectListBySelective" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from mst_dealer
+        <include refid="Selective_If_List"></include>
+        <if test="currentPage != null and pageSize != null">
+            <bind name="start" value="(currentPage - 1) * pageSize"/>
+            <bind name="end" value="currentPage * pageSize - 1"/>
+            limit #{start},#{end}
+        </if>
+    </select>
+
+<!--    按条件统计-->
+    <select id="selectCountBySelective" resultType="int">
+        select count(1) from mst_dealer
+        <include refid="Selective_If_List"></include>
+    </select>
+
+    <!--分页查找全部-->
+    <select id="selectListAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from mst_dealer
+        <if test="currentPage != null and pageSize != null">
+            <bind name="start" value="(currentPage - 1) * pageSize"/>
+            <bind name="end" value="pageSize"/>
+            limit #{start},#{end}
+        </if>
+    </select>
+    <!--查询总数-->
+    <select id="selectCountAll" resultType="Integer">
+        select count(1) from mst_master
+    </select>
+</mapper>
